@@ -7,7 +7,7 @@ const cnx = require("./bdata");
 //Consultar
 history.get("/history/listing", (req, res) => {
   let sql =
-    "SELECT history.id, history.description, history.date, history.note,people.id, people.name AS culpable, history.estado FROM history INNER JOIN people ON history.id_people = people.id";
+    "SELECT history.id, history.description, history.date, history.note,people.id as bb, people.name AS culpable, history.estado FROM history INNER JOIN people ON history.id_people = people.id";
   cnx.query(sql, (error, data) => {
     try {
       res.status(200).send(data);
@@ -21,9 +21,12 @@ history.get("/history/listing", (req, res) => {
   });
 });
 //Consultar por ID
-history.get("/history/listing/:id", (req, res) => {
+history.get("/history/listinUno/:id", (req, res) => {
   let id = req.params.id;
-  let sql = `SELECT * FROM history WHERE id =${id}`;
+  let sql = `SELECT 
+  history.description, history.date, history.note,history.id_people
+ FROM history JOIN people  ON history.id = people.id
+ WHERE history.id = ${id}`;
   //cnx.query(`SELECT * FROM people WHERE id =${id}  ORDER BY lastname`, (error, data) => {
   cnx.query(sql, (error, data) => {
     try {
@@ -38,7 +41,24 @@ history.get("/history/listing/:id", (req, res) => {
     }
   });
 });
-
+/* //para colocar toda la tabla de historia
+history.get("/history/listing/:id", (req, res) => {
+  let id = req.params.id;
+  let sql = `SELECT * FROM history WHERE id =${id}`;
+  //cnx.query(`SELECT * FROM people WHERE id =${id}  ORDER BY lastname`, (error, data) => {
+  cnx.query(sql, (error, data) => {
+    try {
+      res.status(200).send(data);
+    } catch (error) {
+      console.log(error);
+      throw `hay un error en la consulta${error}`;
+      /*   res.status(404).send({
+          id:error.id,
+          mensaje:error.message,
+      }); */
+//}
+//});
+//}); */
 //insertar un antecedente
 
 history.post("/history/create", (req, res) => {
@@ -60,28 +80,30 @@ history.post("/history/create", (req, res) => {
 
 //Actualizar un registro
 history.put("/history/update/:id", (req, res) => {
-  let id = req.params.id; //parametro
+  let id = req.params.id;
   let frmdata = {
     description: req.body.description,
     date: req.body.date,
     note: req.body.note,
-    id_people:req.body.id_people,
-    estado:req.body.estado
   };
-  cnx.query("update history set? where id=?", [frmdata, id], (error, data) => {
-    try {
-      res.status(200).send("Actualizacion exitosa!!");
-    } catch (error) {
-      console.log(error);
-      throw `hay un error en la consulta${error}`;
+  
+  cnx.query("UPDATE history SET ? WHERE id=?", [frmdata, id], (error, data) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error en el servidor" }); // Devuelve un objeto JSON con un mensaje de error
+      return;
     }
+    
+    res.status(200).json({ message: "¡Actualización exitosa!" }); // Devuelve un objeto JSON con un mensaje de éxito
   });
 });
+
+
 //Actualizar un rsolo registro por estado
 history.put("/history/updateUnoEstado/:id", (req, res) => {
   let id = req.params.id; //parametro
   let frmdata = {
-    estado:req.body.estado
+    estado: req.body.estado,
   };
   cnx.query("update history set? where id=?", [frmdata, id], (error, data) => {
     try {

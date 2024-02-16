@@ -12,11 +12,17 @@ fetch("http://localhost:3000/history/listing")
         history.note !== undefined ? history.note : ""
       }</td> <td>${
         history.culpable !== undefined ? history.culpable : ""
-      }</td><td>${history.id !== undefined ? history.id : ""}</td><td>${
+      }</td><td>${history.bb !== undefined ? history.bb : ""}</td><td>${
         history.estado !== undefined ? history.estado : ""
       }</td>
-      <td><button type="submit" class="btnBorrar" onclick="btnBorrar()">Eliminar</button></td>
-      <td><button type="submit" class="btnEditar"onclick="btnEditar()">Editar</button></td></tr>`;
+      <td><button type="submit" class="btnBorrar" onclick="btnBorrar('${
+        history.id
+      }','${history.estado}')">Cambiar estado</button></td>
+      <td><button type="submit" class="btnEditar" onclick="btnEditar('${
+        history.id
+      }', '${history.description}', '${history.date}', '${history.note}', '${
+        history.culpable
+      }')">Editar</button></td></tr>`;
 
       miTabla.innerHTML += fila;
     });
@@ -25,14 +31,12 @@ fetch("http://localhost:3000/history/listing")
 
 function funcionMostrarFormulario() {
   Swal.fire({
-    title: "Reportes Espacial",
+    title: "Reportes Espaciales",
     html: `
-     
-      
         <input type="text" id="description" class="swal2-input" placeholder="Descripcion">
-        <input type="text" id="note" class="swal2-input" placeholder="Nota">
-        <input type="date" id="date" class="swal2-input" placeholder="">
-      
+        <input type="date" id="date" class="swal2-input" placeholder="" >
+        <input type="text" id="note" class="swal2-input" placeholder="Nota" >
+        <input type="number" id="id_people" class="swal2-input" placeholder="Culpable" >
       `,
     inputAttributes: {
       autocapitalize: "off",
@@ -45,46 +49,105 @@ function funcionMostrarFormulario() {
       const date = document.getElementById("date").value;
       const description = document.getElementById("description").value;
       const note = document.getElementById("note").value;
-
-      if (!date || !description || !note) {
+      const id_people = document.getElementById("id_people").value;
+      
+      // Verificar si algún campo está vacío
+      if (!date || !description || !note || !id_people) {
         Swal.showValidationMessage("Por favor, complete todos los campos.");
+        return false; // Detener el envío del formulario si algún campo está vacío
       } else {
-        return { date, description, note };
+        // Hacer una solicitud para obtener los datos de las personas
+        return fetch("http://localhost:3000/people/listing")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error al obtener los datos de las personas.");
+            }
+            return response.json();
+          })
+          .then((peopleData) => {
+            // Verificar si el id_people existe y el estado del usuario es activo
+            const idExists = peopleData.some((person) => person.id === parseInt(id_people));
+            const isActive = peopleData.some((person) => person.id === parseInt(id_people) && person.estado === "activo");
+    
+            if (!idExists) {
+              Swal.showValidationMessage("El id especificado no existe.");
+              return false; // Detener el envío del formulario si el id_people no existe
+            } else if (!isActive) {
+              Swal.showValidationMessage("El estado del usuario está inactivo.");
+              return false; // Detener el envío del formulario si el estado del usuario no es activo
+            }
+    
+            // Si todo está bien, preparar los datos para enviar
+            let data = {
+              description: description,
+              date: date,
+              note: note,
+              id_people: id_people,
+            };
+    
+            // Enviar la solicitud para crear el historial
+            return fetch("http://localhost:3000/history/create", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Error al actualizar el dato del elemento.");
+              }
+              Swal.fire({
+                title: "¡Éxito!",
+                text: "Se agregó correctamente.",
+                icon: "success",
+              }).then(() => {
+                window.location.assign("http://127.0.0.1:5500/Cliente/historial.html");
+              });
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          })
+          .catch(error => {
+            console.log(error);
+          });
       }
-    },
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Aquí puedes utilizar los datos ingresados por el usuario
-      const { date, description, note } = result.value;
-      // Luego puedes registrar el reporte o realizar cualquier otra acción
-      Swal.fire({
-        title: "¡Reporte registrado!",
-        text: "El reporte ha sido registrado con éxito.",
-        icon: "success",
-      });
     }
+    
   });
 }
 //funcion para eliminar la historia por uno
 
 // Esta función se llama cuando se hace clic en el botón de eliminar
-function btnBorrar() {
+function btnBorrar(id, estadoUsuario) {
+  let descript = {};
+  if (estadoUsuario == "activo") {
+    descript = {
+      estado: "inactivo",
+    };
+  } else {
+    descript = {
+      estado: "activo",
+    };
+  }
+  window.location.assign("http://127.0.0.1:5500/Cliente/historial.html");
+
   fetch(`http://localhost:3000/history/updateUnoEstado/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ id: id }), // Envía el ID al servidor
+    body: JSON.stringify(descript),
   })
     .then((response) => {
       if (response.ok) {
-        return response.json(); // Recibe la respuesta del servidor
+        return response.json();
       } else {
         throw new Error("Error al actualizar el estado del elemento.");
       }
     })
     .then((data) => {
-      // El servidor debería devolver el nuevo estado actualizado
       const nuevoEstado = data.nuevoEstado;
       console.log(
         `Estado del elemento con ID ${id} actualizado a ${nuevoEstado}.`
@@ -96,84 +159,68 @@ function btnBorrar() {
   console.log(id);
 }
 
-// Llamar a la función para cargar la tabla cuando se carga la página
+// Esta función se llama cuando se quiere editar la historia
 
-/*  const swalWithBootstrapButtons = Swal.mixin({
-    customClass: {
-      confirmButton: "btn btn-success",
-      cancelButton: "btn btn-danger",
-    },
-    buttonsStyling: false,
-  });
-  swalWithBootstrapButtons
-    .fire({
-      title: "Desea cambiar el estado de la historia",
-      text: "El estado no es permanente",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "si, Desactivar!",
-      cancelButtonText: "No, cancel!",
-      reverseButtons: true,
-    })
-    .then((result) => {
-      if (result.isConfirmed) {
-        swalWithBootstrapButtons.fire({
-          title: "El estado ha cambiado!",
-          text: "",
-          icon: "success",
-        });
-      } else if (
-        /* Read more about handling dismissals below */
-//  result.dismiss === Swal.DismissReason.cancel
-// ) {
-//swalWithBootstrapButtons.fire({
-//title: "Cancelled",
-//text: "Your imaginary file is safe :)",
-//  icon: "error",
-//  });
-// }
-/* }); */
-//}
+function btnEditar(id, descri, fechaIngresada, nota, bb) {
+  const formattedDate = new Date(fechaIngresada).toISOString().split("T")[0];
 
-function btnEditar() {
   Swal.fire({
-    title: "Reportes Espacial",
+    title: "Editar reporte espacial",
     html: `
-         
-          
-            <input type="text" id="description" class="swal2-input" placeholder="Descripcion">
-            <input type="date" id="fecha" class="swal2-input" placeholder="Fecha">
-            <input type="text" id="nota" class="swal2-input" placeholder="Nota">
-            <input type="number" id="culpablex" class="swal2-input" placeholder="culpable">
-          `,
+      <input type="text" id="description" class="swal2-input" placeholder="Descripcion" value="${descri}">
+      <input type="date" id="fecha" class="swal2-input" placeholder="Fecha" value="${formattedDate}">
+      <input type="text" id="nota" class="swal2-input" placeholder="Nota" value="${nota}">
+      <input type="text" id="culpablex" class="swal2-input" placeholder="Culpable" value="${bb}" disabled>
+    `,
     inputAttributes: {
       autocapitalize: "off",
     },
     showCancelButton: true,
-    confirmButtonText: "Registrar reporte",
+    confirmButtonText: "Actualizar reporte",
     showLoaderOnConfirm: true,
     allowOutsideClick: () => !Swal.isLoading(),
     preConfirm: () => {
-      const Descripcion = document.getElementById("description").value;
-      const fecha = document.getElementById("fecha").value;
+      const description = document.getElementById("description").value;
+      const date = document.getElementById("fecha").value; // La fecha ya está en formato ISO 8601 (YYYY-MM-DD)
       const note = document.getElementById("nota").value;
-      const culpable = document.getElementById("culpablex").value;
-      if (!Descripcion || !fecha || !note || !culpable) {
+
+      if (!description || !date || !note) {
         Swal.showValidationMessage("Por favor, complete todos los campos.");
       } else {
-        return { Descripcion, fecha, note, culpable };
+        const data = {
+          description: description,
+          date: date,
+          note: note,
+        };
+
+        return fetch(`http://localhost:3000/history/update/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error al actualizar el dato del elemento.");
+            }
+
+            Swal.fire({
+              title: "¡Éxito!",
+              text: "La edición se ha completado correctamente.",
+              icon: "success",
+            }).then(() => {
+              window.location.assign(
+                "http://127.0.0.1:5500/Cliente/historial.html"
+              );
+            });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       }
     },
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Aquí puedes utilizar los datos ingresados por el usuario
-      const { Descripcion, fecha, note, culpable } = result.value;
-      // Luego puedes registrar el reporte o realizar cualquier otra acción
-      Swal.fire({
-        title: "¡Reporte registrado!",
-        text: "El reporte ha sido registrado con éxito.",
-        icon: "success",
-      });
-    }
+  }).catch((error) => {
+    console.error(error);
   });
 }

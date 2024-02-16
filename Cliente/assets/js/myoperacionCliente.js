@@ -1,141 +1,198 @@
 const miTabla = document.getElementById("miTabla");
 fetch("http://localhost:3000/people/listing")
   .then((res) => res.json()) // Agrega paréntesis para llamar a la función json()
-  .then((Peliculas) => {
-    Peliculas.map((cliente) => {
+  .then((reportados) => {
+    reportados.map((cliente) => {
       let fila = `<tr>
-      <td>${cliente.id}</td>
-      <td>${cliente.name}</td>
-      <td>${cliente.lastname}</td>
-      <td>${cliente.nickname}</td>
-      <td>${cliente.email}</td>
-      <td>${cliente.type}</td>
-      <td><button type="submit" class="btnBorrar" onclick="btnBorrar()">Eliminar</button></td>
-      <td><button type="submit" class="btnEditar" onclick="btnEditar()">Editar</button></td>
+      <td>${cliente.id !== undefined ? cliente.id : ""}</td>
+      <td>${cliente.name !== undefined ? cliente.name : ""}</td>
+      <td>${cliente.lastname !== undefined ? cliente.lastname : ""}</td>
+      <td>${cliente.nickname !== undefined ? cliente.nickname : ""}</td>
+      <td>${cliente.email !== undefined ? cliente.email : ""}</td>
+      <td>${cliente.type !== undefined ? cliente.type : ""}</td>
+      <td>${cliente.estado !== undefined ? cliente.estado : ""}</td>
+      <td><button type="submit" class="btnBorrar" onclick="btnBorrar('${
+        cliente.id
+      }','${cliente.estado}')">Cambiar estado</button></td>
+      <td><button type="submit" class="btnEditar" onclick="btnEditar('${
+        cliente.id
+      }', '${cliente.name}', '${cliente.lastname}', '${cliente.nickname}', '${
+        cliente.email
+      }','${cliente.type}')"">Editar</button></td>
     </tr>`;
       miTabla.innerHTML += fila;
     });
   })
   .catch((error) => console.error("Error al cargar el archivo JSON:", error));
-function funcionMostrarFormulario() {
+function funcionMostrarFormularioPeople() {
   Swal.fire({
-    title: "Reportes Espacial",
+    title: "Reportes Espaciales",
     html: `
-   
-    
-      <input type="text" id="description" class="swal2-input" placeholder="Descripcion">
-      <input type="text" id="note" class="swal2-input" placeholder="Nota">
-      <input type="date" id="date" class="swal2-input" placeholder="">
-    
-    `,
-    inputAttributes: {
-      autocapitalize: "off",
-    },
-    showCancelButton: true,
-    confirmButtonText: "Registrar reporte",
-    showLoaderOnConfirm: true,
-    allowOutsideClick: () => !Swal.isLoading(),
-    preConfirm: () => {
-      const date = document.getElementById("date").value;
-      const description = document.getElementById("description").value;
-      const note = document.getElementById("note").value;
-
-      if (!date || !description || !note) {
-        Swal.showValidationMessage("Por favor, complete todos los campos.");
-      } else {
-        return { date, description, note };
-      }
-    },
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Aquí puedes utilizar los datos ingresados por el usuario
-      const { date, description, note } = result.value;
-      // Luego puedes registrar el reporte o realizar cualquier otra acción
-      Swal.fire({
-        title: "¡Reporte registrado!",
-        text: "El reporte ha sido registrado con éxito.",
-        icon: "success",
-      });
-    }
-  });
-}
-function btnBorrar() {
-  const swalWithBootstrapButtons = Swal.mixin({
-    customClass: {
-      confirmButton: "btn btn-success",
-      cancelButton: "btn btn-danger",
-    },
-    buttonsStyling: false,
-  });
-  swalWithBootstrapButtons
-    .fire({
-      title: "Desea eliminar la historia",
-      text: "El borrado es permanente",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel!",
-      reverseButtons: true,
-    })
-    .then((result) => {
-      if (result.isConfirmed) {
-        swalWithBootstrapButtons.fire({
-          title: "Deleted!",
-          text: "Your file has been deleted.",
-          icon: "success",
-        });
-      } else if (
-        /* Read more about handling dismissals below */
-        result.dismiss === Swal.DismissReason.cancel
-      ) {
-        swalWithBootstrapButtons.fire({
-          title: "Cancelled",
-          text: "Your imaginary file is safe :)",
-          icon: "error",
-        });
-      }
-    });
-}
-function btnEditar() {
-  Swal.fire({
-    title: "Reportes Espacial",
-    html: `
-     
-      
-        <input type="text" id="description" class="swal2-input" placeholder="Nombre">
-        <input type="text" id="note" class="swal2-input" placeholder="Apellido">
-        <input type="text" id="date" class="swal2-input" placeholder="Alias">
-        <input type="text" id="note" class="swal2-input" placeholder="Gmail">
-        <input type="text" id="date" class="swal2-input" placeholder="Tipo">
+        <input type="text" id="name" class="swal2-input" placeholder="Nombre">
+        <input type="text" id="lastname" class="swal2-input" placeholder="Apellido" >
+        <input type="text" id="nickname" class="swal2-input" placeholder="Alias" >
+        <input type="text" id="email" class="swal2-input" placeholder="Gmail" >
+        <input type="number" id="type" class="swal2-input" placeholder="Tipo" >
       `,
     inputAttributes: {
       autocapitalize: "off",
     },
     showCancelButton: true,
-    confirmButtonText: "Editar reporte",
+    confirmButtonText: "Registrar Usuario ilegal",
     showLoaderOnConfirm: true,
     allowOutsideClick: () => !Swal.isLoading(),
     preConfirm: () => {
-      const date = document.getElementById("date").value;
-      const description = document.getElementById("description").value;
-      const note = document.getElementById("note").value;
+      const name = document.getElementById("name").value;
+      const lastname = document.getElementById("lastname").value;
+      const nickname = document.getElementById("nickname").value;
+      const email = document.getElementById("email").value;
+      const type = document.getElementById("type").value;
 
-      if (!date || !description || !note) {
+      if (!name || !lastname || !nickname || !email || !type) {
         Swal.showValidationMessage("Por favor, complete todos los campos.");
+        return false; // Detener el envío del formulario si algún campo está vacío
       } else {
-        return { date, description, note };
+        let data = {
+          name: name,
+          lastname: lastname,
+          nickname: nickname,
+          email: email,
+          type:type,
+        };
+
+        return fetch("http://localhost:3000/people/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error al guardar los datos.");
+            }
+            Swal.fire({
+              title: "¡Éxito!",
+              text: "Se agregó correctamente.",
+              icon: "success",
+            }).then(() => {
+              window.location.assign(
+                "http://127.0.0.1:5500/Cliente/index.html"
+              );
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+
+          .catch((error) => {
+            console.log(error);
+          });
       }
     },
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Aquí puedes utilizar los datos ingresados por el usuario
-      const { date, description, note } = result.value;
-      // Luego puedes registrar el reporte o realizar cualquier otra acción
-      Swal.fire({
-        title: "¡Reporte registrado!",
-        text: "El reporte ha sido registrado con éxito.",
-        icon: "success",
-      });
-    }
+  });
+}
+// Esta función se llama cuando se hace clic en el botón de eliminar
+function btnBorrar(id, estadoUsuario) {
+  let descript = {};
+  if (estadoUsuario == "activo") {
+    descript = {
+      estado: "inactivo",
+    };
+  } else {
+    descript = {
+      estado: "activo",
+    };
+  }
+  window.location.assign("http://127.0.0.1:5500/Cliente/index.html");
+  fetch(`http://localhost:3000/people/updateUnoEstado/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(descript),
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Error al actualizar el estado del elemento.");
+      }
+    })
+    .then((data) => {
+      const nuevoEstado = data.nuevoEstado;
+      console.log(
+        `Estado del elemento con ID ${id} actualizado a ${nuevoEstado}.`
+      );
+    })
+    .catch((error) => {
+      console.error("Error al actualizar el estado del elemento:", error);
+    });
+  console.log(id);
+}
+
+function btnEditar(id, nombre, apellido, alias, gmail, tipo) {
+  Swal.fire({
+    title: "Reportes Espacial de usuarios",
+    html: `
+        <input type="text" id="name" class="swal2-input" placeholder="Nombre" value="${nombre}">
+        <input type="text" id="lastname" class="swal2-input" placeholder="Apellido" value="${apellido}">
+        <input type="text" id="nickname" class="swal2-input" placeholder="Alias"  value="${alias}">
+        <input type="text" id="email" class="swal2-input" placeholder="Gmail" value="${gmail}">
+        <input type="text" id="type" class="swal2-input" placeholder="Tipo"  value="${tipo}">
+      `,
+    inputAttributes: {
+      autocapitalize: "off",
+    },
+    showCancelButton: true,
+    confirmButtonText: "Actualizar persona",
+    showLoaderOnConfirm: true,
+    allowOutsideClick: () => !Swal.isLoading(),
+    preConfirm: () => {
+      const name = document.getElementById("name").value;
+      const lastname = document.getElementById("lastname").value;
+      const nickname = document.getElementById("nickname").value;
+      const email = document.getElementById("email").value;
+      const type = document.getElementById("type").value;
+
+      if (!name || !lastname || !nickname || !email || !type) {
+        Swal.showValidationMessage("Por favor, complete todos los campos.");
+      } else {
+        const data = {
+          name: name,
+          lastname: lastname,
+          nickname: nickname,
+          email: email,
+          type: type,
+        };
+        return fetch(`http://localhost:3000/people/update/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error al actualizar el dato del elemento.");
+            }
+
+            Swal.fire({
+              title: "¡Éxito!",
+              text: "La edición se ha completado correctamente.",
+              icon: "success",
+            }).then(() => {
+              window.location.assign(
+                "http://127.0.0.1:5500/Cliente/index.html"
+              );
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    },
+  }).catch((error) => {
+    console.log(error);
   });
 }

@@ -6,7 +6,8 @@ const cnx = require("./bdata");
 /*Desarrollo del CRUD*/
 //Consultar
 people.get("/people/listing", (req, res) => {
-  let sql = "select*from people order by id";
+  let sql =
+    "SELECT id, estado, name, lastname,nickname, email, type FROM people";
   cnx.query(sql, (error, data) => {
     try {
       res.status(200).send(data);
@@ -22,8 +23,7 @@ people.get("/people/listing", (req, res) => {
 //Consultar por ID
 people.get("/people/listing/:id", (req, res) => {
   let id = req.params.id;
-  let sql = `SELECT * FROM people WHERE id =${id}  ORDER BY lastname`;
-  //cnx.query(`SELECT * FROM people WHERE id =${id}  ORDER BY lastname`, (error, data) => {
+  let sql = `SELECT id, estado, name, lastname, nickname, email, type from people where id=${id}`;
   cnx.query(sql, (error, data) => {
     try {
       res.status(200).send(data);
@@ -66,6 +66,21 @@ people.put("/people/update/:id", (req, res) => {
     nickname: req.body.nickname,
     email: req.body.email,
     type: req.body.type,
+  };
+  cnx.query("update people set? where id=?", [frmdata, id], (error, data) => {
+    try {
+      res.status(200).send("Actualizacion exitosa!!");
+    } catch (error) {
+      console.log(error);
+      throw `hay un error en la consulta${error}`;
+    }
+  });
+});
+//Actualizar un rsolo registro por estado
+people.put("/people/updateUnoEstado/:id", (req, res) => {
+  let id = req.params.id; //parametro
+  let frmdata = {
+    estado: req.body.estado,
   };
   cnx.query("update people set? where id=?", [frmdata, id], (error, data) => {
     try {
