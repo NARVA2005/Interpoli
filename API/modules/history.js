@@ -41,6 +41,24 @@ history.get("/history/listinUno/:id", (req, res) => {
     }
   });
 });
+history.get("/history/listinEstadoInactivo", (req, res) => {
+
+  let sql =
+          "SELECT history.id, history.description, history.date, history.note,people.id as bb, people.name AS culpable, history.estado FROM history INNER JOIN people ON history.id_people = people.id WHERE history.estado='inactivo'";
+  //cnx.query(`SELECT * FROM people WHERE id =${id}  ORDER BY lastname`, (error, data) => {
+  cnx.query(sql, (error, data) => {
+    try {
+      res.status(200).send(data);
+    } catch (error) {
+      console.log(error);
+      throw `hay un error en la consulta${error}`;
+      /*   res.status(404).send({
+          id:error.id,
+          mensaje:error.message,
+      }); */
+    }
+  });
+});
 /* //para colocar toda la tabla de historia
 history.get("/history/listing/:id", (req, res) => {
   let id = req.params.id;

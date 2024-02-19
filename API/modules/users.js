@@ -3,10 +3,17 @@ const express = require("express");
 
 const users = express.Router();
 const cnx = require("./bdata");
+const multer = require("multer");
+const path = require("path");
+
+
+
 /*Desarrollo del CRUD*/
 //Consultar
+
+
 users.get("/users/listing", (req, res) => {
-  let sql = "select*from users order by lastname ";
+  let sql = "select*from user";
   cnx.query(sql, (error, data) => {
     try {
       res.status(200).send(data);
@@ -22,7 +29,7 @@ users.get("/users/listing", (req, res) => {
 //Consultar por ID
 users.get("/users/listing/:id", (req, res) => {
   let id = req.params.id;
-  let sql = `SELECT * FROM users WHERE id =${id}  ORDER BY lastname`;
+  let sql = `SELECT * FROM user WHERE id =${id}  ORDER BY lastname`;
   //cnx.query(`SELECT * FROM people WHERE id =${id}  ORDER BY lastname`, (error, data) => {
   cnx.query(sql, (error, data) => {
     try {
@@ -38,17 +45,15 @@ users.get("/users/listing/:id", (req, res) => {
   });
 });
 //insertar una persona
-
 users.post("/users/create", (req, res) => {
   let frmdata = {
     name: req.body.name,
     lastname: req.body.lastname,
-    position: req.body.position,
+    rank: req.body.rank,
     email: req.body.email,
-    password: req.body.password,
-    photo: req.body.photo,
+
   };
-  cnx.query("insert into users set ?", frmdata, (error, data) => {
+  cnx.query("insert into user set ?", frmdata, (error, data) => {
     try {
       res.status(200).send("Insercion exitosa!!");
     } catch (error) {
@@ -58,18 +63,32 @@ users.post("/users/create", (req, res) => {
   });
 });
 
+//Actualizar un rsolo registro por estado
+users.put("/users/updateUnoEstado/:id", (req, res) => {
+  let id = req.params.id; //parametro
+  let frmdata = {
+    estado: req.body.estado,
+  };
+  cnx.query("update user set? where id=?", [frmdata, id], (error, data) => {
+    try {
+      res.status(200).send("Actualizacion exitosa!!");
+    } catch (error) {
+      console.log(error);
+      throw `hay un error en la consulta${error}`;
+    }
+  });
+});
 //Actualizar un registro
 users.put("/users/update/:id", (req, res) => {
   let id = req.params.id; //parametro
   let frmdata = {
     name: req.body.name,
     lastname: req.body.lastname,
-    position: req.body.position,
+    rank: req.body.rank,
     email: req.body.email,
-    password: req.body.password,
-    photo: req.body.photo,
+  
   };
-  cnx.query("update users set? where id=?", [frmdata, id], (error, data) => {
+  cnx.query("update user set? where id=?", [frmdata, id], (error, data) => {
     try {
       res.status(200).send("Actualizacion exitosa!!");
     } catch (error) {
@@ -81,7 +100,7 @@ users.put("/users/update/:id", (req, res) => {
 //Eliminar por ID
 users.delete("/users/deleteid/:id", (req, res) => {
   let id = req.params.id;
-  let sql = `delete from users where id=${id}`;
+  let sql = `delete from user where id=${id}`;
 
   cnx.query(sql, (error, data) => {
     try {
