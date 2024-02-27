@@ -1,24 +1,26 @@
 const miTabla = document.getElementById("miTabla");
-fetch("http://localhost:3000/people/listing/activos")
+fetch("http://localhost:3000/users/listing/activos")
   .then((res) => res.json()) // Agrega paréntesis para llamar a la función json()
   .then((reportados) => {
-    reportados.map((cliente) => {
+    reportados.map((users) => {
       let fila = `<tr>
-      <td>${cliente.id !== undefined ? cliente.id : ""}</td>
-      <td>${cliente.name !== undefined ? cliente.name : ""}</td>
-      <td>${cliente.lastname !== undefined ? cliente.lastname : ""}</td>
-      <td>${cliente.nickname !== undefined ? cliente.nickname : ""}</td>
-      <td>${cliente.email !== undefined ? cliente.email : ""}</td>
-      <td>${cliente.type !== undefined ? cliente.type : ""}</td>
-      <td>${cliente.estado !== undefined ? cliente.estado : ""}</td>
+      <td>${users.id !== undefined ? users.id : ""}</td>
+      <td>${users.name !== undefined ? users.name : ""}</td>
+      <td>${users.lastname !== undefined ? users.lastname : ""}</td>
+      <td>${users.rank !== undefined ? users.rank : ""}</td>
+      <td>${users.email !== undefined ? users.email : ""}</td>
+  
+      <td>${users.photo !== undefined ? users.photo : ""}</td>
+      <td>${users.estado !== undefined ? users.estado : ""}</td>
+     
       <td><button type="submit" class="btnBorrar" onclick="btnBorrar('${
-        cliente.id
-      }','${cliente.estado}')">Cambiar estado</button></td>
+        users.id
+      }','${users.estado}')">Cambiar estado</button></td>
       <td><button type="submit" class="btnEditar" onclick="btnEditar('${
-        cliente.id
-      }', '${cliente.name}', '${cliente.lastname}', '${cliente.nickname}', '${
-        cliente.email
-      }','${cliente.type}')"">Editar</button></td>
+        users.id
+      }', '${users.name}', '${users.lastname}', '${users.rank}', '${
+        users.email
+      }','${users.type}')"">Editar</button></td>
     </tr>`;
       miTabla.innerHTML += fila;
     });
@@ -26,41 +28,42 @@ fetch("http://localhost:3000/people/listing/activos")
   .catch((error) => console.error("Error al cargar el archivo JSON:", error));
 function funcionMostrarFormularioPeople() {
   Swal.fire({
-    title: "Reportes Espaciales",
+    title: "Crear Funcionario",
     html: `
         <input type="text" id="name" class="swal2-input" placeholder="Nombre">
         <input type="text" id="lastname" class="swal2-input" placeholder="Apellido" >
-        <input type="text" id="nickname" class="swal2-input" placeholder="Alias" >
+        <input type="number" id="rank" class="swal2-input" placeholder="Cargo" >
         <input type="text" id="email" class="swal2-input" placeholder="Gmail" >
-        <input type="number" id="type" class="swal2-input" placeholder="Tipo" >
+   
+
       `,
     inputAttributes: {
       autocapitalize: "off",
     },
     showCancelButton: true,
-    confirmButtonText: "Registrar Usuario ilegal",
+    confirmButtonText: "Registrar funcionario",
     showLoaderOnConfirm: true,
     allowOutsideClick: () => !Swal.isLoading(),
     preConfirm: () => {
       const name = document.getElementById("name").value;
       const lastname = document.getElementById("lastname").value;
-      const nickname = document.getElementById("nickname").value;
+      const rank = document.getElementById("rank").value;
       const email = document.getElementById("email").value;
-      const type = document.getElementById("type").value;
+    
 
-      if (!name || !lastname || !nickname || !email || !type) {
+
+      if (!name || !lastname || !rank || !email) {
         Swal.showValidationMessage("Por favor, complete todos los campos.");
         return false; // Detener el envío del formulario si algún campo está vacío
       } else {
         let data = {
           name: name,
           lastname: lastname,
-          nickname: nickname,
+          rank: rank,
           email: email,
-          type:type,
         };
 
-        return fetch("http://localhost:3000/people/create", {
+        return fetch("http://localhost:3000/users/create", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -77,7 +80,7 @@ function funcionMostrarFormularioPeople() {
               icon: "success",
             }).then(() => {
               window.location.assign(
-                "http://127.0.0.1:5500/Cliente/login.html"
+                "http://127.0.0.1:5500/Cliente/frmUsers.html"
               );
             });
           })
@@ -104,8 +107,8 @@ function btnBorrar(id, estadoUsuario) {
       estado: "activo",
     };
   }
-  window.location.assign("http://127.0.0.1:5500/Cliente/login.html");
-  fetch(`http://localhost:3000/people/updateUnoEstado/${id}`, {
+  window.location.assign("http://127.0.0.1:5500/Cliente/frmUsers.html");
+  fetch(`http://localhost:3000/users/updateUnoEstado/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -131,15 +134,14 @@ function btnBorrar(id, estadoUsuario) {
   console.log(id);
 }
 
-function btnEditar(id, nombre, apellido, alias, gmail, tipo) {
+function btnEditar(id, nombre, apellido, cargo, gmail) {
   Swal.fire({
     title: "Reportes Espacial de usuarios",
     html: `
         <input type="text" id="name" class="swal2-input" placeholder="Nombre" value="${nombre}">
         <input type="text" id="lastname" class="swal2-input" placeholder="Apellido" value="${apellido}">
-        <input type="text" id="nickname" class="swal2-input" placeholder="Alias"  value="${alias}">
+        <input type="number" id="rank" class="swal2-input" placeholder="Alias"  value="${cargo}">
         <input type="text" id="email" class="swal2-input" placeholder="Gmail" value="${gmail}">
-        <input type="text" id="type" class="swal2-input" placeholder="Tipo"  value="${tipo}">
       `,
     inputAttributes: {
       autocapitalize: "off",
@@ -151,21 +153,19 @@ function btnEditar(id, nombre, apellido, alias, gmail, tipo) {
     preConfirm: () => {
       const name = document.getElementById("name").value;
       const lastname = document.getElementById("lastname").value;
-      const nickname = document.getElementById("nickname").value;
+      const rank = document.getElementById("rank").value;
       const email = document.getElementById("email").value;
-      const type = document.getElementById("type").value;
 
-      if (!name || !lastname || !nickname || !email || !type) {
+      if (!name || !lastname || !rank || !email ) {
         Swal.showValidationMessage("Por favor, complete todos los campos.");
       } else {
         const data = {
           name: name,
           lastname: lastname,
-          nickname: nickname,
+          rank: rank,
           email: email,
-          type: type,
         };
-        return fetch(`http://localhost:3000/people/update/${id}`, {
+        return fetch(`http://localhost:3000/users/update/${id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -183,7 +183,7 @@ function btnEditar(id, nombre, apellido, alias, gmail, tipo) {
               icon: "success",
             }).then(() => {
               window.location.assign(
-                "http://127.0.0.1:5500/Cliente/login.html"
+                "http://127.0.0.1:5500/Cliente/frmUsers.html"
               );
             });
           })

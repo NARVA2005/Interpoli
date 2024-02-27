@@ -1,9 +1,10 @@
 const miTabla = document.getElementById("miTabla");
-
-fetch("http://localhost:3000/history/listing")
+let rows=0;
+fetch("http://localhost:3000/history/listing/activos")
   .then((res) => res.json())
   .then((Peliculas) => {
     Peliculas.map((history) => {
+rows++;
       let fila = `<tr><td>${
         history.id !== undefined ? history.id : ""
       }</td><td>${
@@ -26,6 +27,19 @@ fetch("http://localhost:3000/history/listing")
 
       miTabla.innerHTML += fila;
     });
+if(rows==0){
+
+// la tabla no tiene filas
+  
+miTabla.innerHTML = `
+<tr>
+  <td colspan="7">
+    <p>No se encontraron datos para mostrar</p> 
+    <img src="https://static.vecteezy.com/system/resources/previews/003/105/011/non_2x/no-data-and-lose-data-vector.jpg" class="imgendeFilasVacias">
+  </td>
+</tr>
+`;
+}
   })
   .catch((error) => console.error("Error al cargar el archivo JSON:", error));
 

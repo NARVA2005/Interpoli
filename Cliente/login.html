@@ -1,0 +1,73 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/mystyle.css" />
+    <link rel="icon" href="imagen/logo-removebg-preview.png">
+    <title>InterPoli</title>
+  </head>
+  <body>
+    <nav class="navbar bg-body-tertiary miEncabezado">
+      <div class="container-fluid miEncabezado">
+        <div class="container">
+          <div class="row">
+            <div class="col-2">        <img src="imagen/logo-removebg-preview.png" alt="" srcset="" />
+            </div>
+            <div class="col-2">      
+                <button onclick="funcionMostrarFormularioPeople()" class="ReportesF">Crear usuario</button>
+            </div>
+            <div class="col-2"> <a href="login.html">
+              <button class="usurioF">Historial de usuarios</button>
+            </a> </div>
+            <div class="col-2"> <a href="historial.html">
+              <button class="reporteF">Historial de reportes</button>
+            </a> </div>
+            <div class="col-2">
+              <a href="frmUsers.html">
+                <button class="users">Historial de funcionarios de InterPoli</button>
+              </a> </div>
+              <a href="frmReportesInactivos.html" class="enlaceReportados">Clientes inactivos</a>
+          </div>
+        </div>
+
+       
+       
+      
+
+      </div>
+    </nav>
+
+  
+        <div class="container">
+          <div class="row">
+            <h1 class="titulo">
+              Base de datos de los usuarios registrados por InterPoli
+            </h1>
+            <table class="table table-dark table-striped-columns" id="miTabla">
+              <th scope="col">ID</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Apellido</th>
+              <th scope="col">Alias</th>
+              <th scope="col">Gmail</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Estado</th>
+            </table>
+            
+          </div>
+          
+        </div>
+        
+      </div>
+      
+    </div>
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/myoperacionCliente.js"></script>
+  </body>
+</html>

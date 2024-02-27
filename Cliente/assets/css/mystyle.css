@@ -57,3 +57,27 @@ body {
 .btnEditar {
   background-color: rgb(0, 128, 255);
 }
+.enlaceReportados {
+  color: #337ab7; /* Color del texto */
+  font-size: 20px; /* Tamaño de la fuente */
+  text-decoration: none; /* Quita la subrayado predeterminado */
+  padding: 10px 20px; /* Espacio alrededor del texto */
+  border: 2px solid #337ab7; /* Borde del enlace */
+  border-radius: 5px; /* Bordes redondeados */
+}
+
+.enlaceReportados:hover {
+  background-color: #337ab7; /* Color de fondo al pasar el mouse */
+  color: #fff; /* Color del texto al pasar el mouse */
+}
+.users{
+  background-color: #33b7ae;
+}
+  .miEncabezado{
+    background-color: black;
+    color: white;
+  }
+  .imgendeFilasVacias{
+    height: 300px;
+    left: 300px;
+  }
