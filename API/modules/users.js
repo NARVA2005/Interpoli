@@ -12,8 +12,8 @@ const path = require("path");
 //Consultar
 
 
-users.get("/users/listing", (req, res) => {
-  let sql = "select*from user";
+users.get("/users/listing/activos", (req, res) => {
+  let sql = "select*from user where estado='activo'";
   cnx.query(sql, (error, data) => {
     try {
       res.status(200).send(data);
@@ -26,6 +26,37 @@ users.get("/users/listing", (req, res) => {
     }
   });
 });
+users.get("/users/listing/inactivo", (req, res) => {
+  let sql = "select*from user where estado='inactivo'";
+  cnx.query(sql, (error, data) => {
+    try {
+      res.status(200).send(data);
+    } catch (error) {
+      console.log(error);
+      /*   res.status(404).send({
+        id:error.id,
+        mensaje:error.message,
+    }); */
+    }
+  });
+});
+users.get("/users/listing/BuscarCorreo/:email", (req, res) => {
+  let email = req.params.email;
+  let sql = "SELECT email FROM user WHERE email = ? ";
+  cnx.query(sql, [email], (error, data) => {
+      if (error) {
+          console.error("Error al buscar el correo electrónico:", error);
+          res.status(500).send("Error interno del servidor al buscar el correo electrónico.");
+      } else {
+          if (data.length > 0) {
+              res.status(200).send({ email: true }); // El correo electrónico existe
+          } else {
+              res.status(200).send({ email: false }); // El correo electrónico no existe
+          }
+      }
+  });
+});
+
 //Consultar por ID
 users.get("/users/listing/:id", (req, res) => {
   let id = req.params.id;

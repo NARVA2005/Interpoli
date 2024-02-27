@@ -5,9 +5,25 @@ const history = express.Router();
 const cnx = require("./bdata");
 /*Desarrollo del CRUD*/
 //Consultar
-history.get("/history/listing", (req, res) => {
+history.get("/history/listing/activos", (req, res) => {
   let sql =
-    "SELECT history.id, history.description, history.date, history.note,people.id as bb, people.name AS culpable, history.estado FROM history INNER JOIN people ON history.id_people = people.id";
+    "SELECT history.id, history.description, history.date, history.note,people.id as bb, people.name AS culpable, history.estado FROM history INNER JOIN people ON history.id_people = people.id where history.estado='activo'";
+  cnx.query(sql, (error, data) => {
+    try {
+      res.status(200).send(data);
+    } catch (error) {
+      console.log(error);
+      /*   res.status(404).send({
+        id:error.id,
+        mensaje:error.message,
+    }); */
+    }
+  });
+});
+//Consultar
+history.get("/history/listing/inactivos", (req, res) => {
+  let sql =
+    "SELECT history.id, history.description, history.date, history.note,people.id as bb, people.name AS culpable, history.estado FROM history INNER JOIN people ON history.id_people = people.id where history.estado='inactivo'";
   cnx.query(sql, (error, data) => {
     try {
       res.status(200).send(data);
