@@ -75,25 +75,6 @@ history.get("/history/listinEstadoInactivo", (req, res) => {
     }
   });
 });
-/* //para colocar toda la tabla de historia
-history.get("/history/listing/:id", (req, res) => {
-  let id = req.params.id;
-  let sql = `SELECT * FROM history WHERE id =${id}`;
-  //cnx.query(`SELECT * FROM people WHERE id =${id}  ORDER BY lastname`, (error, data) => {
-  cnx.query(sql, (error, data) => {
-    try {
-      res.status(200).send(data);
-    } catch (error) {
-      console.log(error);
-      throw `hay un error en la consulta${error}`;
-      /*   res.status(404).send({
-          id:error.id,
-          mensaje:error.message,
-      }); */
-//}
-//});
-//}); */
-//insertar un antecedente
 
 history.post("/history/create", (req, res) => {
   let frmdata = {

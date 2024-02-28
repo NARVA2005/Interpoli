@@ -1,7 +1,4 @@
 
-
-
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -9,32 +6,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/css/mystyle.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.css" />
     <link rel="icon" href="imagen/logo-removebg-preview.png">
     <title>InterPoli</title>
   </head>
   <body>
-    <nav class="navbar bg-body-tertiary miEncabezado">
-      <div class="container-fluid miEncabezado">
-        <div class="container">
-          <div class="row">
-            <div class="col-2">        <img src="imagen/logo-removebg-preview.png" alt="" srcset="" />
-            </div>
-          
-            <div class="col-2"> <a href="login.html">
-              <button class="usurioF">🔚 Atras</button>
-            </a> </div>
-          
-           
-           
-          </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <img src="imagen/logo-removebg-preview.png" alt="" />
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+                Personas
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="login.html">Historial de personas</a></li>
+                <li><a class="dropdown-item" href="frmpeopleInactivos.html">Personas Inactivas</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+                Reportes  
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="historial.html">Historial de Reportes</a></li>
+                <li><a class="dropdown-item" href="frmReportesInactivos.html">Reportes inactivos</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+                Funcionarios
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="frmUsers.html">Historial de Funcionarios</a></li>
+                <li><a class="dropdown-item" href="frmInactivosUsers.html">Funcionarios inactivos</a></li>
+              </ul>
+            </li>
+          </ul>
+        
         </div>
-
-       
-       
-      
-
       </div>
     </nav>
+
+
+
+
+
+
+  
 
   
         <div class="container">
@@ -42,14 +69,19 @@
             <h1 class="titulo">
               Base de datos de los usuarios inactivos por interPoli
             </h1>
-            <table class="table table-dark table-striped-columns" id="miTabla">
-              <th scope="col">ID</th>
-              <th scope="col">Nombre</th>
-              <th scope="col">Apellido</th>
-              <th scope="col">Alias</th>
-              <th scope="col">Gmail</th>
-              <th scope="col">Tipo</th>
-              <th scope="col">Estado</th>
+            <table class="table table-dark table-striped-columns" id="datatable">
+              <thead>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Apellido</th>
+                <th scope="col">Alias</th>
+                <th scope="col">Gmail</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Estado</th>
+              </thead>
+             <tbody id="miTabla">
+
+             </tbody>
             </table>
             
           </div>
@@ -60,7 +92,9 @@
       
     </div>
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
-    <script src="assets/js/myoperacionCliente.js"></script>
+ <script src="assets/js/bootstrap.bundle.min.js"></script>
+ <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+ <script src=" https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
+ <script src="assets/js/inactivosPeople.js"></script>
   </body>
 </html>

@@ -1,10 +1,8 @@
 const miTabla = document.getElementById("miTabla");
-let rows=0;
 fetch("http://localhost:3000/people/listing/inactivos")
   .then((res) => res.json()) // Agrega paréntesis para llamar a la función json()
   .then((reportados) => {
     reportados.map((cliente) => {
-        rows++;
       let fila = `<tr>
       <td>${cliente.id !== undefined ? cliente.id : ""}</td>
       <td>${cliente.name !== undefined ? cliente.name : ""}</td>
@@ -16,24 +14,34 @@ fetch("http://localhost:3000/people/listing/inactivos")
       <td><button type="submit" class="btnBorrar" onclick="btnBorrar('${
         cliente.id
       }','${cliente.estado}')">Cambiar estado</button></td>
-      <td><button type="submit" class="btnEditar" onclick="btnEditar('${
-        cliente.id
-      }', '${cliente.name}', '${cliente.lastname}', '${cliente.nickname}', '${
-        cliente.email
-      }','${cliente.type}')"">Editar</button></td>
+     
     </tr>`;
       miTabla.innerHTML += fila;
     });
-    if(rows==0){
-        miTabla.innerHTML = `
-        <tr>
-          <td colspan="7">
-            <p>No se encontraron datos para mostrar</p> 
-            <img src="https://static.vecteezy.com/system/resources/previews/003/105/011/non_2x/no-data-and-lose-data-vector.jpg" class="imgendeFilasVacias">
-          </td>
-        </tr>
-        `;
-    }
+    $("#datatable").DataTable({
+      lengthMenu: [5,10,15,50,100,250,500],
+      columnDefs: [
+        { orderable: false, targets: [6,7]},
+        { searchable: false, targets: [6,7] },
+      ],
+      pageLength: 5,
+      destroy: true,
+      language: {
+        lengthMenu: "Mostrar _MENU_ Persona inactiva por página",
+        zeroRecords: "Ningún Persona inactiva encontrado",
+        info: "Mostrando _START_ a _END_ Personas inactivas de _TOTAL_ ",
+        infoEmpty: "Ningún Persona encontrado",
+        infoFiltered: "(filtrados desde _MAX_ Personas inactivas totales)",
+        search: "Buscar:",
+        loadingRecords: "Cargando...",
+        paginate: {
+          first: "<<",
+          last: ">>",
+          next: ">",
+          previous: "<",
+        },
+      },
+    });
   })
   .catch((error) => console.error("Error al cargar el archivo JSON:", error));
   function btnBorrar(id, estadoUsuario) {
@@ -47,7 +55,7 @@ fetch("http://localhost:3000/people/listing/inactivos")
         estado: "activo",
       };
     }
-    window.location.assign("http://127.0.0.1:5500/Cliente/frmInactivosUsers.html");
+    window.location.assign("http://127.0.0.1:5500/Cliente/frmpeopleInactivos.html");
     fetch(`http://localhost:3000/people/updateUnoEstado/${id}`, {
       method: "PUT",
       headers: {

@@ -24,6 +24,30 @@ fetch("http://localhost:3000/users/listing/activos")
     </tr>`;
       miTabla.innerHTML += fila;
     });
+    $("#datatable").DataTable({
+      lengthMenu: [5,10,15,50,100,250,500],
+      columnDefs: [
+        { orderable: false, targets: [7,8]},
+        { searchable: false, targets: [7,8] },
+      ],
+      pageLength: 5,
+      destroy: true,
+      language: {
+        lengthMenu: "Mostrar _MENU_ Funcionario por página",
+        zeroRecords: "Ningún Funcionario encontrado",
+        info: "Mostrando _START_ a _END_ Funcionarios de _TOTAL_ ",
+        infoEmpty: "Ningún Funcionario encontrado",
+        infoFiltered: "(filtrados desde _MAX_ Funcionarios totales)",
+        search: "Buscar:",
+        loadingRecords: "Cargando...",
+        paginate: {
+          first: "<<",
+          last: ">>",
+          next: ">",
+          previous: "<",
+        },
+      },
+    });
   })
   .catch((error) => console.error("Error al cargar el archivo JSON:", error));
 function funcionMostrarFormularioPeople() {
@@ -56,20 +80,35 @@ function funcionMostrarFormularioPeople() {
         Swal.showValidationMessage("Por favor, complete todos los campos.");
         return false; // Detener el envío del formulario si algún campo está vacío
       } else {
-        let data = {
-          name: name,
-          lastname: lastname,
-          rank: rank,
-          email: email,
-        };
 
-        return fetch("http://localhost:3000/users/create", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+        return fetch("http://localhost:3000/users/listing")
+        .then((response)=>{
+          if(!response.ok){
+throw new Error("Error al obtener los datos de los usuarios");
+          }
+          return response.json();
         })
+        .then((usersData)=>{
+          const CorreoExiste=usersData.some((users)=>users.email===email);
+          if(CorreoExiste){
+            Swal.showValidationMessage("El correo especificado  existe.");
+            return false; // Detener el envío del formulario si el id_people no existe
+          }
+          let data={
+            name:name,
+            lastname:lastname,
+            rank:rank,
+            email:email
+          };
+          return fetch("http://localhost:3000/users/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+        })
+     
           .then((response) => {
             if (!response.ok) {
               throw new Error("Error al guardar los datos.");

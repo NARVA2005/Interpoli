@@ -22,6 +22,30 @@ fetch("http://localhost:3000/people/listing/activos")
     </tr>`;
       miTabla.innerHTML += fila;
     });
+    $("#datatable").DataTable({
+      lengthMenu: [5,10,15,50,100,250,500],
+      columnDefs: [
+        { orderable: false, targets: [7,8]},
+        { searchable: false, targets: [7,8] },
+      ],
+      pageLength: 5,
+      destroy: true,
+      language: {
+        lengthMenu: "Mostrar _MENU_ Cliente por página",
+        zeroRecords: "Ningún Cliente encontrado",
+        info: "Mostrando _START_ a _END_ Cliente de _TOTAL_ ",
+        infoEmpty: "Ningún Cliente encontrado",
+        infoFiltered: "(filtrados desde _MAX_ Clientes totales)",
+        search: "Buscar:",
+        loadingRecords: "Cargando...",
+        paginate: {
+          first: "<<",
+          last: ">>",
+          next: ">",
+          previous: "<",
+        },
+      },
+    });
   })
   .catch((error) => console.error("Error al cargar el archivo JSON:", error));
 function funcionMostrarFormularioPeople() {

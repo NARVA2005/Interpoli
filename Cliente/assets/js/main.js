@@ -2,19 +2,6 @@ let abrirRegistro = () => {
   window.open("registro.html", "_self");
 };
 
-/* alertify.confirm(
-  "This is a confirm dialog.",
-  function () {
-    alertify.success("Ok");
-  },
-  function () {
-    alertify.error("Cancel");
-  }
-); */
-
-/* alertify.alert("Error", "Clave Invalida !"); */
-
-//ejemplo con SWEETALERT
 
 let valor = 1;
 

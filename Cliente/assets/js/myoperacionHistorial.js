@@ -1,15 +1,13 @@
 const miTabla = document.getElementById("miTabla");
-let rows=0;
 fetch("http://localhost:3000/history/listing/activos")
   .then((res) => res.json())
   .then((Peliculas) => {
     Peliculas.map((history) => {
-rows++;
       let fila = `<tr><td>${
         history.id !== undefined ? history.id : ""
       }</td><td>${
         history.description !== undefined ? history.description : ""
-      }</td> <td>${history.date !== undefined ? history.date : ""}</td>  <td>${
+      }</td> <td>${history.date != undefined ? history.date.substring(0,10) : ""}</td>  <td>${
         history.note !== undefined ? history.note : ""
       }</td> <td>${
         history.culpable !== undefined ? history.culpable : ""
@@ -27,19 +25,30 @@ rows++;
 
       miTabla.innerHTML += fila;
     });
-if(rows==0){
-
-// la tabla no tiene filas
-  
-miTabla.innerHTML = `
-<tr>
-  <td colspan="7">
-    <p>No se encontraron datos para mostrar</p> 
-    <img src="https://static.vecteezy.com/system/resources/previews/003/105/011/non_2x/no-data-and-lose-data-vector.jpg" class="imgendeFilasVacias">
-  </td>
-</tr>
-`;
-}
+    $("#datatable").DataTable({
+      lengthMenu: [5,10,15,50,100,250,500],
+      columnDefs: [
+        { orderable: false, targets: [7,8]},
+        { searchable: false, targets: [7,8] },
+      ],
+      pageLength: 5,
+      destroy: true,
+      language: {
+        lengthMenu: "Mostrar _MENU_ historial por página",
+        zeroRecords: "Ningún historial encontrado",
+        info: "Mostrando _START_ a _END_ historiales de _TOTAL_ ",
+        infoEmpty: "Ningún historial encontrado",
+        infoFiltered: "(filtrados desde _MAX_ historiales totales)",
+        search: "Buscar:",
+        loadingRecords: "Cargando...",
+        paginate: {
+          first: "<<",
+          last: ">>",
+          next: ">",
+          previous: "<",
+        },
+      },
+  });
   })
   .catch((error) => console.error("Error al cargar el archivo JSON:", error));
 
@@ -116,7 +125,7 @@ function funcionMostrarFormulario() {
                 text: "Se agregó correctamente.",
                 icon: "success",
               }).then(() => {
-                window.location.assign("http://127.0.0.1:5500/Cliente/historial.html");
+             window.location.assign("http://127.0.0.1:5500/Cliente/historial.html");
               });
             })
             .catch((error) => {

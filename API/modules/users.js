@@ -10,7 +10,20 @@ const path = require("path");
 
 /*Desarrollo del CRUD*/
 //Consultar
-
+users.get("/users/listing", (req, res) => {
+  let sql = "select*from user";
+  cnx.query(sql, (error, data) => {
+    try {
+      res.status(200).send(data);
+    } catch (error) {
+      console.log(error);
+      /*   res.status(404).send({
+        id:error.id,
+        mensaje:error.message,
+    }); */
+    }
+  });
+});
 
 users.get("/users/listing/activos", (req, res) => {
   let sql = "select*from user where estado='activo'";

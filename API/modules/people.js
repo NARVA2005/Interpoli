@@ -3,8 +3,24 @@ const express = require("express");
 
 const people = express.Router();
 const cnx = require("./bdata");
+
 /*Desarrollo del CRUD*/
 //Consultar
+people.get("/people/listing", (req, res) => {
+  let sql =
+    "SELECT id, estado, name, lastname,nickname, email, type FROM people;";
+  cnx.query(sql, (error, data) => {
+    try {
+      res.status(200).send(data);
+    } catch (error) {
+      console.log(error);
+      /*   res.status(404).send({
+        id:error.id,
+        mensaje:error.message,
+    }); */
+    }
+  });
+});
 people.get("/people/listing/activos", (req, res) => {
   let sql =
     "SELECT id, estado, name, lastname,nickname, email, type FROM people where estado='activo'";
