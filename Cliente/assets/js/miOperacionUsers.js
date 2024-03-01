@@ -10,7 +10,7 @@ fetch("http://localhost:3000/users/listing/activos")
       <td>${users.rank !== undefined ? users.rank : ""}</td>
       <td>${users.email !== undefined ? users.email : ""}</td>
   
-      <td>${users.photo !== undefined ? users.photo : ""}</td>
+      <td>${users.photo !== undefined ? `<img src="http://localhost:3000/users/mostrarimagen/${users.photo}" style="max-width: 100px; max-height: 100px;" />` : ""}</td>
       <td>${users.estado !== undefined ? users.estado : ""}</td>
      
       <td><button type="submit" class="btnBorrar" onclick="btnBorrar('${
@@ -50,66 +50,100 @@ fetch("http://localhost:3000/users/listing/activos")
     });
   })
   .catch((error) => console.error("Error al cargar el archivo JSON:", error));
-function funcionMostrarFormularioPeople() {
-  Swal.fire({
-    title: "Crear Funcionario",
-    html: `
-        <input type="text" id="name" class="swal2-input" placeholder="Nombre">
-        <input type="text" id="lastname" class="swal2-input" placeholder="Apellido" >
-        <input type="number" id="rank" class="swal2-input" placeholder="Cargo" >
-        <input type="text" id="email" class="swal2-input" placeholder="Gmail" >
-   
+  function validarFormulario(){
+  const name = document.getElementById("name").value;
+  const lastname = document.getElementById("lastname").value;
+  const rank = document.getElementById("rank").value;
+  const photofilename = document.getElementById("photo").files[0];
+  const email = document.getElementById("email").value;
 
-      `,
-    inputAttributes: {
-      autocapitalize: "off",
-    },
-    showCancelButton: true,
-    confirmButtonText: "Registrar funcionario",
-    showLoaderOnConfirm: true,
-    allowOutsideClick: () => !Swal.isLoading(),
-    preConfirm: () => {
-      const name = document.getElementById("name").value;
-      const lastname = document.getElementById("lastname").value;
-      const rank = document.getElementById("rank").value;
-      const email = document.getElementById("email").value;
+  // Verificar que los campos obligatorios no estén vacíos
+  if (!name || !lastname || !rank || !photofilename || !email) {
+      Swal.showValidationMessage("Por favor, complete todos los campos.");
+      return false; // Detener el envío del formulario si algún campo está vacío
+  }
+
+  // Verificar formato de correo electrónico
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+      Swal.showValidationMessage("Por favor, ingrese un correo electrónico válido.");
+      return false;
+  }
+
+  // Verificar otros criterios de validación según sea necesario
+
+  // Si todas las validaciones pasan, devuelve true para permitir el envío del formulario
+  return true;
+}
+  function funcionMostrarFormularioUsers(id) {
+    Swal.fire({
+      title: "Crear Funcionario",
+      html: `
+          <input type="text" id="name" class="swal2-input" placeholder="Nombre">
+          <input type="text" id="lastname" class="swal2-input" placeholder="Apellido">
+          <input type="number" id="rank" class="swal2-input" placeholder="Cargo">
+          <input type="text" id="email" class="swal2-input" placeholder="Gmail">
+          <input type="file" id="photo" class="swal2-input" placeholder="">
+        `,
+      inputAttributes: {
+        autocapitalize: "off",
+      },
+      showCancelButton: true,
+      confirmButtonText: "Registrar funcionario",
+      showLoaderOnConfirm: true,
+      allowOutsideClick: () => !Swal.isLoading(),
+      preConfirm: () => {
+        if (!validarFormulario()) {
+          return false;
+        }
+      
+        // Obtener los valores de los campos después de validar el formulario
+        const name = document.getElementById("name").value;
+        const lastname = document.getElementById("lastname").value;
+        const rank = document.getElementById("rank").value;
+        const photofilename = document.getElementById("photo").files[0];
+        const email = document.getElementById("email").value;
+              // Verificar el tipo de archivo
+      const allowedExtensions = ["jpg", "jpeg", "png", "pdf"];
+      const extension = photofilename.name.split(".").pop().toLowerCase();
+      if (!allowedExtensions.includes(extension)) {
+        Swal.showValidationMessage("El archivo debe ser de tipo JPG, JPEG, PNG o PDF.");
+        return false;
+      }
     
 
-
-      if (!name || !lastname || !rank || !email) {
-        Swal.showValidationMessage("Por favor, complete todos los campos.");
-        return false; // Detener el envío del formulario si algún campo está vacío
-      } else {
-
-        return fetch("http://localhost:3000/users/listing")
-        .then((response)=>{
-          if(!response.ok){
-throw new Error("Error al obtener los datos de los usuarios");
+        let data = {
+          name: name,
+          lastname: lastname,
+          rank: rank,
+          email: email,
+        
+        };
+     
+      
+        fetch("http://localhost:3000/users/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+        .then((response) => {
+          if (response.email==email) {
+            throw new Error("Error al insertar el usuario.");
           }
           return response.json();
         })
-        .then((usersData)=>{
-          const CorreoExiste=usersData.some((users)=>users.email===email);
-          if(CorreoExiste){
-            Swal.showValidationMessage("El correo especificado  existe.");
-            return false; // Detener el envío del formulario si el id_people no existe
-          }
-          let data={
-            name:name,
-            lastname:lastname,
-            rank:rank,
-            email:email
-          };
-          return fetch("http://localhost:3000/users/create", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          })
-        })
-     
-          .then((response) => {
+        .then((user) => {
+            const userID = user.id;
+            const imageData = new FormData();
+            imageData.append('photo', photofilename);
+      
+            return fetch(`http://localhost:3000/users/subirimagen/${userID}`, {
+              method: 'PUT',
+              body: imageData
+            });
+          }) .then((response) => {
             if (!response.ok) {
               throw new Error("Error al guardar los datos.");
             }
@@ -117,23 +151,46 @@ throw new Error("Error al obtener los datos de los usuarios");
               title: "¡Éxito!",
               text: "Se agregó correctamente.",
               icon: "success",
-            }).then(() => {
-              window.location.assign(
-                "http://127.0.0.1:5500/Cliente/frmUsers.html"
-              );
-            });
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-
-          .catch((error) => {
-            console.log(error);
+            })
+          }).catch((error) => {
+            console.error("Error al insertar el usuario:", error);
+            // Mostrar un mensaje de error al usuario
           });
-      }
-    },
+      },
+    })
+  }
+  
+  
+/* function handleFileSelect(event, userID) {
+ // Obtener el archivo seleccionado
+ const photofilename = event.target.files[0];
+  
+  // Crear un objeto FormData y agregar el archivo
+  let imageData = new FormData();
+  imageData.append('photo', photofilename);
+  
+  // Enviar la imagen al servidor
+  fetch(`http://localhost:3000/users/subirimagen/${userID}`, {
+    method: 'PUT',
+    body: imageData
+  })
+  .then(() => {
+    // En este punto, la imagen se ha subido correctamente
+    // Mostrar el mensaje de éxito y redirigir
+    Swal.fire({
+      title: "¡Éxito!",
+      text: "Se agregó correctamente.",
+      icon: "success",
+    });
+    window.location.assign("http://127.0.0.1:5500/Cliente/frmUsers.html");
+  })
+  .catch(error => {
+    // Capturar cualquier error que ocurra en el proceso
+    console.log(error);
   });
-}
+} */
+
+
 // Esta función se llama cuando se hace clic en el botón de eliminar
 function btnBorrar(id, estadoUsuario) {
   let descript = {};

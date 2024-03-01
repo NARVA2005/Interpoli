@@ -76,6 +76,7 @@ function funcionMostrarFormularioPeople() {
         Swal.showValidationMessage("Por favor, complete todos los campos.");
         return false; // Detener el envío del formulario si algún campo está vacío
       } else {
+        
         let data = {
           name: name,
           lastname: lastname,
